@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.AreaChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="720.0" prefWidth="1280.0" stylesheets="@estilo/estiloAPP.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.company.proyectopgv.controller.PrimaryController">
+   <top>
+      <MenuBar id="menuBar" nodeOrientation="LEFT_TO_RIGHT" BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Opciones">
+            <items>
+                <MenuItem mnemonicParsing="false" text="Reporte de Información del equipo" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Ayuda">
+            <items>
+                  <MenuItem mnemonicParsing="false" text="Guía de ayuda" />
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </MenuBar>
+   </top>
+   <left>
+      <VBox id="vBoxServers" alignment="BOTTOM_CENTER" prefHeight="665.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER" prefHeight="48.0" prefWidth="200.0" style="-fx-background-color: #E74C3C;">
+               <children>
+                  <Label text="SERVIDOR 1" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="48.0" prefWidth="200.0" style="-fx-background-color: #E74C3C;">
+               <children>
+                  <Label text="SERVIDOR 2" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </VBox>
+   </left>
+   <center>
+      <VBox prefHeight="720.0" prefWidth="1280.0" BorderPane.alignment="CENTER">
+         <children>
+            <TabPane id="tabpane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+              <tabs>
+                  <Tab text="Información general">
+                     <content>
+                        <Pane>
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="664.0" prefWidth="1080.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label id="label" prefHeight="22.0" prefWidth="242.0" text="Sistema operativo:" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                          <Label id="text" fx:id="osLabel" prefHeight="46.0" prefWidth="566.0" text="Label" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets bottom="20.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label id="label" prefHeight="22.0" prefWidth="244.0" text="Placa base:" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                          <Label id="text" fx:id="motherBoardLabel" prefHeight="46.0" prefWidth="528.0" text="Label" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets bottom="20.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label id="label" prefHeight="22.0" prefWidth="243.0" text="Información sobre el CPU:" HBox.hgrow="NEVER" />
+                                          <Label id="text" fx:id="cpuLabel" contentDisplay="TOP" prefHeight="150.0" prefWidth="590.0" text="Label" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="119.0" prefWidth="1040.0">
+                                       <children>
+                                          <Label id="label" prefHeight="22.0" prefWidth="245.0" text="Memoria RAM:" HBox.hgrow="ALWAYS" />
+                                          <Label id="text" fx:id="ramLabel" contentDisplay="CENTER" prefHeight="46.0" prefWidth="526.0" text="Label" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="68.0" prefWidth="560.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <Label id="label" prefHeight="22.0" prefWidth="244.0" text="Discos duros:" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                          <Label id="text" fx:id="discoDuroLabel" prefHeight="46.0" prefWidth="663.0" text="Label" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </Pane>
+                     </content>
+                  </Tab>
+                  <Tab text="CPU">
+                    <content>
+                      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT">
+                           <children>
+                              <GridPane alignment="CENTER" layoutX="-1.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" nodeOrientation="LEFT_TO_RIGHT" prefHeight="664.0" prefWidth="1080.0">
+                                <columnConstraints>
+                                  <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="631.5999145507812" minWidth="10.0" prefWidth="525.7333374023438" />
+                                  <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1172.5999755859375" minWidth="10.0" prefWidth="555.0666625976563" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="421.6000061035156" minHeight="10.0" prefHeight="342.8" vgrow="ALWAYS" />
+                                  <RowConstraints maxHeight="390.26666870117185" minHeight="10.0" prefHeight="346.6" valignment="CENTER" vgrow="ALWAYS" />
+                                </rowConstraints>
+                                 <children>
+                                    <VBox alignment="TOP_CENTER" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                                       <children>
+                                          <Label id="label" alignment="CENTER" text="Lista de Procesos" VBox.vgrow="ALWAYS">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <TableView fx:id="tableViewProcess" VBox.vgrow="ALWAYS">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </TableView>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                    </VBox>
+                                    <VBox alignment="CENTER" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.rowSpan="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                                       <children>
+                                          <Label id="label" text="Uso de la CPU" VBox.vgrow="ALWAYS" />
+                                          <LineChart fx:id="cpuGrafic" VBox.vgrow="ALWAYS">
+                                            <xAxis>
+                                              <CategoryAxis side="BOTTOM" />
+                                            </xAxis>
+                                            <yAxis>
+                                              <NumberAxis side="LEFT" />
+                                            </yAxis>
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </LineChart>
+                                       </children>
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                    </VBox>
+                                    <VBox alignment="TOP_CENTER" prefHeight="330.0" prefWidth="682.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                                       <children>
+                                          <Label id="label" alignment="CENTER" text="Lista de Servicios">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <TableView fx:id="tableViewServices" VBox.vgrow="ALWAYS">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </TableView>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                    </VBox>
+                                    <VBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                       <children>
+                                          <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Label id="label" text="Temperatura CPU:" />
+                                                <Label id="text" text="Label">
+                                                   <HBox.margin>
+                                                      <Insets left="20.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <AreaChart VBox.vgrow="ALWAYS">
+                                            <xAxis>
+                                              <CategoryAxis side="BOTTOM" />
+                                            </xAxis>
+                                            <yAxis>
+                                              <NumberAxis side="LEFT" />
+                                            </yAxis>
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </AreaChart>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </GridPane>
+                           </children></AnchorPane>
+                    </content>
+                  </Tab>
+                <Tab text="Memoria">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <GridPane prefHeight="664.0" prefWidth="1080.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <VBox prefHeight="545.0" prefWidth="600.0" GridPane.rowSpan="2">
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                       <children>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="500.0" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Label id="label" text="Memoria RAM total del equipo:" />
+                                                <Label id="text" fx:id="totalMemoryRam" text="Label" HBox.hgrow="ALWAYS">
+                                                   <HBox.margin>
+                                                      <Insets left="20.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="500.0" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Label id="label" text="Uso de la memoria RAM:" />
+                                                <Label id="text" fx:id="totalUsageRam" text="Label" HBox.hgrow="ALWAYS">
+                                                   <HBox.margin>
+                                                      <Insets left="75.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="2.0" prefWidth="500.0" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Label id="label" text="RAM disponible:" />
+                                                <Label id="text" fx:id="totalAvailableRam" text="Label" HBox.hgrow="ALWAYS">
+                                                   <HBox.margin>
+                                                      <Insets left="145.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="500.0" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Label id="label" text="Mínimo de uso de RAM:" />
+                                                <Label id="text" fx:id="minUsageRam" text="Label" HBox.hgrow="ALWAYS">
+                                                   <HBox.margin>
+                                                      <Insets left="85.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Label id="label" text="Máximo de uso de RAM:" />
+                                                <Label id="text" fx:id="maxUsageRam" text="Label" HBox.hgrow="ALWAYS">
+                                                   <HBox.margin>
+                                                      <Insets left="80.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="TOP_CENTER" GridPane.columnIndex="1">
+                                       <children>
+                                          <Label id="label" text="Total RAM libre/ocupada">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <PieChart fx:id="pieDeUsoGrafic">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </PieChart>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                    </VBox>
+                                    <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label id="label" text="Porcentaje de uso">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <LineChart fx:id="usoDeRamGrafic">
+                                            <xAxis>
+                                              <CategoryAxis side="BOTTOM" />
+                                            </xAxis>
+                                            <yAxis>
+                                              <NumberAxis side="LEFT" />
+                                            </yAxis>
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </LineChart>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </GridPane>
+                           </children></AnchorPane>
+                  </content>
+                </Tab>
+                  <Tab text="Disco">
+                    <content>
+                      <AnchorPane prefHeight="546.0" prefWidth="560.0">
+                           <children>
+                              <GridPane prefHeight="664.0" prefWidth="1080.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <VBox alignment="TOP_CENTER" prefHeight="545.0" prefWidth="600.0" GridPane.columnSpan="2" GridPane.rowSpan="2">
+                                       <children>
+                                          <Label id="label" text="Procesos con Actividad de disco" VBox.vgrow="ALWAYS">
+                                             <VBox.margin>
+                                                <Insets bottom="20.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <TableView fx:id="diskProcessActivityTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                          <Label id="label" text="Actividad de diso" VBox.vgrow="ALWAYS">
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <AreaChart fx:id="diskActivityGrafic" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                            <xAxis>
+                                              <CategoryAxis side="BOTTOM" />
+                                            </xAxis>
+                                            <yAxis>
+                                              <NumberAxis side="LEFT" />
+                                            </yAxis>
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </AreaChart>
+                                          <Label id="label" text="Almacenamiento" VBox.vgrow="ALWAYS" />
+                                          <TableView fx:id="storageTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </TableView>
+                                       </children>
+                                       <GridPane.margin>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </GridPane.margin>
+                                    </VBox>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+                  <Tab text="Red">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <GridPane prefHeight="664.0" prefWidth="1080.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <VBox alignment="TOP_CENTER" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                                       <children>
+                                          <Label id="label" text="Uso de Red" VBox.vgrow="ALWAYS">
+                                             <VBox.margin>
+                                                <Insets />
+                                             </VBox.margin>
+                                          </Label>
+                                          <LineChart fx:id="usageRedGrafic" VBox.vgrow="ALWAYS">
+                                            <xAxis>
+                                              <CategoryAxis side="BOTTOM" />
+                                            </xAxis>
+                                            <yAxis>
+                                              <NumberAxis side="LEFT" />
+                                            </yAxis>
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </LineChart>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </GridPane>
+                           </children></AnchorPane>
+                    </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+</BorderPane>
