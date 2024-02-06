@@ -20,7 +20,7 @@
 	-fx-padding: 20;
 }
 #vBoxServers:hover {
-	-fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 5, 0, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 5, 0, 0, 0);
     -fx-scale-x: 1.03;
     -fx-scale-y: 1.03; 
     -fx-cursor: hand;
@@ -34,23 +34,24 @@
 }
 
 #menu-bar {
-    -fx-background-color: #c2c2c2; /* Gris oscuro para la barra */
+    -fx-background-color: #c2c2c2;
 }
 
 .menu-bar .label {
-    -fx-text-fill: white; /* Color del texto en la barra */
+    -fx-text-fill: white;
     -fx-font-family: "Arial";
-	-fx-font-weight: bold;
+    -fx-font-weight: bold;
     -fx-font-size: 18;
 }
 
 .menu {
-    -fx-background-color: #E74C3C; /* Rojo naranja para los menús desplegables */
+    -fx-background-color: #E74C3C;
 }
 
 .menu .menu-item .label {
-    -fx-text-fill: black; /* Color del texto en los elementos del menú */
+    -fx-text-fill: black;
     -fx-font-family: "Arial";
+    -fx-font-weight: bold;
     -fx-font-size: 14;
 }
 
@@ -62,6 +63,7 @@
 
 .tab .tab-label {
     -fx-font-family: "Arial";
-    -fx-font-size: 16; /* Ajusta el tamaño según tus preferencias */
-    -fx-text-fill: #FF0000; /* Rojo */
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FF0000;
 }

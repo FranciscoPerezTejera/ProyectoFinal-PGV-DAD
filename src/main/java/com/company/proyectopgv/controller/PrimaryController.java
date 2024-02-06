@@ -1,5 +1,6 @@
 package com.company.proyectopgv.controller;
 
+import com.company.proyectopgv.utils.LlenadoDeDatos;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -15,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import oshi.SystemInfo;
+import oshi.hardware.GlobalMemory;
 import oshi.hardware.HWDiskStore;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OSService;
@@ -60,18 +62,38 @@ public class PrimaryController implements Initializable {
     @FXML
     private TableView<OSService> tableViewServices;
 
+    private LlenadoDeDatos utilidad;
+
+    private SystemInfo sistema;
+
+    private long totalMemory;
+    private long availableMemory;
+    private long usedMemory;
+    private double percentageUsed;
+    private double valorMinimo;
+    private double valorMaximo;
+    private boolean inicializado;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        SystemInfo sistema = new SystemInfo();
+        utilidad = new LlenadoDeDatos();
+        sistema = new SystemInfo();
+        inicializado = false;
+
+        actualizarInformacionMemoria(inicializado);
+
+        totalMemoryRam.setText(utilidad.formatBytes(totalMemory));
+        totalAvailableRam.setText(utilidad.formatBytes(availableMemory));
+        totalUsageRam.setText(utilidad.formatBytes(usedMemory));
+        minUsageRam.setText(utilidad.formatPercentage(valorMinimo));
+        maxUsageRam.setText(utilidad.formatPercentage(valorMaximo));
+
         List<HWDiskStore> discos = sistema.getHardware().getDiskStores();
         StringBuilder discosString = new StringBuilder();
         StringBuilder logicProssString = new StringBuilder();
         StringBuilder physicProssString = new StringBuilder();
 
-        
-        
-        
         /**/
         //Lista de procesos
         List<OSProcess> procesos = sistema.getOperatingSystem().getProcesses();
@@ -94,7 +116,7 @@ public class PrimaryController implements Initializable {
 
         tableViewProcess.getColumns().addAll(nameColumn, pidColumn, stateColumn, priorityColumn);
         /**/
-        
+
         //Lista de servicios
         /**/
         List<OSService> servicios = sistema.getOperatingSystem().getServices();
@@ -106,7 +128,7 @@ public class PrimaryController implements Initializable {
 
         TableColumn<OSService, String> servicePIDNameColumn = new TableColumn<>("PID");
         servicePIDNameColumn.setCellValueFactory(data -> {
-        
+
             return new SimpleStringProperty(Integer.toString(data.getValue().getProcessID()));
         });
 
@@ -115,7 +137,7 @@ public class PrimaryController implements Initializable {
 
         tableViewServices.getColumns().addAll(nameServiceColumn, servicePIDNameColumn, serviceStateColumn);
         /**/
-        
+
         discos.forEach((disk) -> {
             discosString.append(disk.getModel() + " " + disk.getSize() + "\n");
         });
@@ -128,6 +150,29 @@ public class PrimaryController implements Initializable {
         ramLabel.setText(sistema.getHardware().getMemory().toString());
         discoDuroLabel.setText(discosString.toString());
 
+    }
+
+    private void actualizarInformacionMemoria(boolean ini) {
+
+        GlobalMemory memory = sistema.getHardware().getMemory();
+        totalMemory = memory.getTotal();
+        availableMemory = memory.getAvailable();
+        usedMemory = totalMemory - availableMemory;
+        percentageUsed = (usedMemory * 100.0) / totalMemory;
+
+        if (!inicializado) {
+            valorMinimo = percentageUsed;
+            valorMaximo = percentageUsed;
+            inicializado = true;
+
+        } else {
+            if (valorMinimo > percentageUsed) {
+                valorMinimo = percentageUsed;
+            }
+            if (valorMaximo < percentageUsed) {
+                valorMaximo = percentageUsed;
+            }
+        }
     }
 
 }
