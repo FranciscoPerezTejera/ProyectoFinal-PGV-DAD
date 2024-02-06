@@ -4,6 +4,7 @@ import com.company.proyectopgv.utils.LlenadoDeDatos;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -116,7 +117,7 @@ public class PrimaryController implements Initializable {
 
         tableViewProcess.getColumns().addAll(nameColumn, pidColumn, stateColumn, priorityColumn);
         /**/
-
+        
         //Lista de servicios
         /**/
         List<OSService> servicios = sistema.getOperatingSystem().getServices();
@@ -136,12 +137,31 @@ public class PrimaryController implements Initializable {
         serviceStateColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getState().toString()));
 
         tableViewServices.getColumns().addAll(nameServiceColumn, servicePIDNameColumn, serviceStateColumn);
+        
         /**/
-
+        /*Lista de discos*/
         discos.forEach((disk) -> {
             discosString.append(disk.getModel() + " " + disk.getSize() + "\n");
         });
+        
+        /**/
+        /**/
+        
+        /**/
+        /*Gráfico de total memoria*/
+        ObservableList <PieChart.Data> pieData = FXCollections.observableArrayList(        
+                new PieChart.Data("Memoria ocupada: ", usedMemory),
+                new PieChart.Data("Memoria disponible: ", availableMemory));
+        
+        pieData.forEach(data -> {
+        
+             data.nameProperty().bind(Bindings.concat(data.getName(), " ", utilidad.formatBytes(data.pieValueProperty().longValue())));
+        });
 
+        pieDeUsoGrafic.getData().addAll(pieData);
+        /**/
+        /**/
+        
         osLabel.setText(sistema.getOperatingSystem().toString());
         motherBoardLabel.setText(sistema.getHardware().getComputerSystem().getBaseboard().getManufacturer() + " "
                 + sistema.getHardware().getComputerSystem().getBaseboard().getModel() + " "
