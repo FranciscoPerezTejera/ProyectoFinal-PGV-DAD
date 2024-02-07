@@ -21,8 +21,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import oshi.SystemInfo;
-import oshi.driver.windows.wmi.MSAcpiThermalZoneTemperature;
-import oshi.hardware.Display;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.GraphicsCard;
 import oshi.hardware.HWDiskStore;
@@ -93,7 +91,6 @@ public class PrimaryController implements Initializable {
     private double valorMaximo;
     private boolean inicializado;
     private int numeroDeGraficas;
-    private List<OSProcess> procesos;
     private XYChart.Series series;
 
     @Override
