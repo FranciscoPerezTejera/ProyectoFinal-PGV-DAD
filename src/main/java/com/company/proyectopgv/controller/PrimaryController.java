@@ -126,7 +126,7 @@ public class PrimaryController implements Initializable {
                         totalAvailableRam.setText(utilidad.formatBytes(availableMemory));
                         minUsageRam.setText(utilidad.formatPercentage(valorMinimo));
                         maxUsageRam.setText(utilidad.formatPercentage(valorMaximo));
-                        porcentajeUsoCPU = sistema.getHardware().getProcessor().getSystemCpuLoad(1) * 100;
+                        porcentajeUsoCPU = sistema.getHardware().getProcessor().getSystemCpuLoad(500) * 100;
                     }
                     );
                     
