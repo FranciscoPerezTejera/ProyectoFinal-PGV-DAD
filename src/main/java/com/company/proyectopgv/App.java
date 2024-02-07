@@ -12,7 +12,7 @@ public class App extends Application {
 
     private static Scene scene;
     public static Stage stage;
-    private final int MIN_HEIGHT = 720;
+    private final int MIN_HEIGHT = 730;
     private final int MIN_WIDTH = 1280;
 
     @Override

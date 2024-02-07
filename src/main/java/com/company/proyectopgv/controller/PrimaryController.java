@@ -1,6 +1,6 @@
 package com.company.proyectopgv.controller;
 
-import com.company.proyectopgv.utils.LlenadoDeDatos;
+import com.company.proyectopgv.utils.Utils;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -9,6 +9,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.AreaChart;
@@ -17,13 +18,16 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.GraphicsCard;
 import oshi.hardware.HWDiskStore;
+import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.SoundCard;
 import oshi.hardware.UsbDevice;
 import oshi.software.os.OSProcess;
@@ -44,7 +48,7 @@ public class PrimaryController implements Initializable {
     @FXML
     private TableView<OSProcess> tableViewProcess;
     @FXML
-    private LineChart<?, ?> cpuGrafic;
+    private LineChart<Number, Number> cpuGrafic;
     @FXML
     private Label totalMemoryRam;
     @FXML
@@ -81,8 +85,10 @@ public class PrimaryController implements Initializable {
     private CategoryAxis xMemory;
     @FXML
     private Label temperaturaCPU;
+    @FXML
+    private Button busquedaDeServidores;
 
-    private LlenadoDeDatos utilidad;
+    private Utils utilidad;
     private SystemInfo sistema;
     private long totalMemory;
     private long availableMemory;
@@ -91,12 +97,14 @@ public class PrimaryController implements Initializable {
     private double valorMaximo;
     private boolean inicializado;
     private int numeroDeGraficas;
-    private XYChart.Series series;
+    private double porcentajeUsoCPU;
+    private XYChart.Series seriesRam;
+    private XYChart.Series seriesCPU;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        utilidad = new LlenadoDeDatos();
+        utilidad = new Utils();
         sistema = new SystemInfo();
         inicializado = false;
         numeroDeGraficas = 1;
@@ -118,10 +126,10 @@ public class PrimaryController implements Initializable {
                         totalAvailableRam.setText(utilidad.formatBytes(availableMemory));
                         minUsageRam.setText(utilidad.formatPercentage(valorMinimo));
                         maxUsageRam.setText(utilidad.formatPercentage(valorMaximo));
-
+                        porcentajeUsoCPU = sistema.getHardware().getProcessor().getSystemCpuLoad(1) * 100;
                     }
                     );
-
+                    
                     Thread.sleep(5000);
 
                 } catch (InterruptedException ex) {
@@ -130,12 +138,18 @@ public class PrimaryController implements Initializable {
                 numeroDeGraficas++;
                 actualizarInformacionMemoria(inicializado);
                 utilidad.actualizarPieRAM(pieDeUsoGrafic, usedMemory, availableMemory);
-                utilidad.actualizarGraficaUsoRAM(series, String.valueOf(numeroDeGraficas), utilidad.formatBytesToInteger(usedMemory));
+                utilidad.actualizarGraficaUsoRAM(seriesRam, String.valueOf(numeroDeGraficas), utilidad.formatBytesToouble(usedMemory));
+                utilidad.actualizarGraficaUsoCPU(seriesCPU, String.valueOf(numeroDeGraficas), (int)porcentajeUsoCPU);
             }
         }
         );
         monitoreo.setDaemon(true);
         monitoreo.start();
+    }
+
+    @FXML
+    private void onSearchServer(ActionEvent event) {
+
     }
 
     private void actualizarInformacionMemoria(boolean ini) {
@@ -280,11 +294,21 @@ public class PrimaryController implements Initializable {
 
     private void cargarXYChart() {
 
+        /*Ejes de gráfica de Uso de RAM*/
         yMemory.setLabel("Porcentaje de RAM");
-        series = new XYChart.Series();
-        series.setName("Uso de la RAM");
-        series.getData().add(new XYChart.Data(String.valueOf(numeroDeGraficas), utilidad.formatBytesToInteger(usedMemory)));
-        usoDeRamGrafic.getData().add(series);
+        seriesRam = new XYChart.Series();
+        seriesRam.setName("Uso de la RAM");
+        seriesRam.getData().add(new XYChart.Data(String.valueOf(numeroDeGraficas), utilidad.formatBytesToouble(usedMemory)));
+        usoDeRamGrafic.getData().add(seriesRam);
+
+        /*Eles de gráfica de Uso de CPU*/
+        HardwareAbstractionLayer hardware = sistema.getHardware();
+        CentralProcessor processor = hardware.getProcessor();
+        porcentajeUsoCPU = sistema.getHardware().getProcessor().getSystemCpuLoad(1) * 100;
+        seriesCPU = new XYChart.Series();
+        seriesCPU.setName("Uso de CPU");
+        seriesCPU.getData().add(new XYChart.Data(String.valueOf(numeroDeGraficas), porcentajeUsoCPU));
+        cpuGrafic.getData().add(seriesCPU);
 
     }
 
@@ -311,4 +335,5 @@ public class PrimaryController implements Initializable {
         tarjetaSonidoLabel.setText(tarjetaSonidoString.toString());
         temperaturaCPU.setText(String.valueOf(sistema.getHardware().getSensors().getCpuTemperature()) + " ºC");
     }
+
 }

@@ -15,18 +15,18 @@
 }
 
 #vBoxServers {
-	
-	-fx-background-color: #c2c2c2;
-	-fx-padding: 20;
+
+    -fx-background-color: #c2c2c2;
+    -fx-padding: 20;
 }
 #vBoxServers:hover {
     -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 5, 0, 0, 0);
     -fx-scale-x: 1.03;
-    -fx-scale-y: 1.03; 
+    -fx-scale-y: 1.03;
     -fx-cursor: hand;
 }
 #labelTitle {
-	-fx-font-family: "Arial";
+    -fx-font-family: "Arial";
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-text-fill: orange;
@@ -56,9 +56,9 @@
 }
 
 #tabpane {
-	
-	
-	
+
+
+
 }
 
 .tab .tab-label {
@@ -66,4 +66,24 @@
     -fx-font-size: 16;
     -fx-font-weight: bold;
     -fx-text-fill: #FF0000;
+}
+
+#buscarServidores {
+    -fx-font-family: "Arial";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: #2ECC71;
+    -fx-padding: 10px 5px;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 0, 0);
+}
+
+#buscarServidores:hover {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 5, 0, 0, 0);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-cursor: hand;
+    -fx-background-color: #27AE60;
 }

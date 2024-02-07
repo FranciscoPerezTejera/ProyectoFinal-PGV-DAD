@@ -5,7 +5,7 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 
-public class LlenadoDeDatos {
+public class Utils {
 
     public void llenadoListaProcesos() {
 
@@ -19,22 +19,29 @@ public class LlenadoDeDatos {
         return String.format("%.2f GB", gigabytes);
     }
 
-    public Integer formatBytesToInteger(long bytes) {
+    public Double formatBytesToouble(long bytes) {
         double kilobytes = bytes / 1024.0;
         double megabytes = kilobytes / 1024.0;
         double gigabytes = megabytes / 1024.0;
 
-        return (int) gigabytes;
+        return gigabytes;
     }
 
     public String formatPercentage(double percentageUsed) {
         return String.format("%.0f%%", percentageUsed);
     }
 
-    public void actualizarGraficaUsoRAM(XYChart.Series series, String tiempo, int valor) {
+    public void actualizarGraficaUsoRAM(XYChart.Series series, String contador, double valor) {
 
         Platform.runLater(() -> {
-            series.getData().add(new XYChart.Data(tiempo, valor));
+            series.getData().add(new XYChart.Data(contador, valor));
+        });
+    }
+
+    public void actualizarGraficaUsoCPU(XYChart.Series series, String contador, double valor) {
+
+        Platform.runLater(() -> {
+            series.getData().add(new XYChart.Data(contador, valor));
         });
     }
 
