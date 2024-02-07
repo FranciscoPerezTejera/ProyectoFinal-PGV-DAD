@@ -4,6 +4,7 @@ import com.company.proyectopgv.utils.LlenadoDeDatos;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -11,14 +12,24 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import oshi.SystemInfo;
+import oshi.driver.windows.wmi.MSAcpiThermalZoneTemperature;
+import oshi.hardware.Display;
 import oshi.hardware.GlobalMemory;
+import oshi.hardware.GraphicsCard;
 import oshi.hardware.HWDiskStore;
+import oshi.hardware.HardwareAbstractionLayer;
+import oshi.hardware.Sensors;
+import oshi.hardware.SoundCard;
+import oshi.hardware.UsbDevice;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OSService;
 
@@ -51,7 +62,7 @@ public class PrimaryController implements Initializable {
     @FXML
     private PieChart pieDeUsoGrafic;
     @FXML
-    private LineChart<?, ?> usoDeRamGrafic;
+    private LineChart<Number, Number> usoDeRamGrafic;
     @FXML
     private TableView<?> diskProcessActivityTable;
     @FXML
@@ -62,18 +73,30 @@ public class PrimaryController implements Initializable {
     private LineChart<?, ?> usageRedGrafic;
     @FXML
     private TableView<OSService> tableViewServices;
+    @FXML
+    private Label tarjetaGraficaLabel;
+    @FXML
+    private Label tarjetaSonidoLabel;
+    @FXML
+    private TableView<UsbDevice> dispositivosUsbTable;
+    @FXML
+    private NumberAxis yMemory;
+    @FXML
+    private CategoryAxis xMemory;
+    @FXML
+    private Label temperaturaCPU;
 
     private LlenadoDeDatos utilidad;
-
     private SystemInfo sistema;
-
     private long totalMemory;
     private long availableMemory;
     private long usedMemory;
-    private double percentageUsed;
     private double valorMinimo;
     private double valorMaximo;
     private boolean inicializado;
+    private int numeroDeGraficas;
+    private List<OSProcess> procesos;
+    private XYChart.Series series;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -81,8 +104,15 @@ public class PrimaryController implements Initializable {
         utilidad = new LlenadoDeDatos();
         sistema = new SystemInfo();
         inicializado = false;
-
+        numeroDeGraficas = 1;
         actualizarInformacionMemoria(inicializado);
+        datosProcesos();
+        datosServicios();
+        datosUSB();
+        StringBuilder discosString = listaDeDiscos();
+        StringBuilder graphicCardString = listaDeTarjetasGraficas();
+        StringBuilder tarjetaSonidoString = listaDeTarjetasSonido();
+        cargarPieDeMemoria();
 
         totalMemoryRam.setText(utilidad.formatBytes(totalMemory));
         totalAvailableRam.setText(utilidad.formatBytes(availableMemory));
@@ -90,13 +120,73 @@ public class PrimaryController implements Initializable {
         minUsageRam.setText(utilidad.formatPercentage(valorMinimo));
         maxUsageRam.setText(utilidad.formatPercentage(valorMaximo));
 
-        List<HWDiskStore> discos = sistema.getHardware().getDiskStores();
-        StringBuilder discosString = new StringBuilder();
-        StringBuilder logicProssString = new StringBuilder();
-        StringBuilder physicProssString = new StringBuilder();
+        osLabel.setText(sistema.getOperatingSystem().toString());
+        motherBoardLabel.setText(sistema.getHardware().getComputerSystem().getBaseboard().getManufacturer() + " "
+                + sistema.getHardware().getComputerSystem().getBaseboard().getModel() + " "
+                + sistema.getHardware().getComputerSystem().getBaseboard().getSerialNumber());
+        cpuLabel.setText(sistema.getHardware().getProcessor().toString());
+        ramLabel.setText(sistema.getHardware().getMemory().toString());
+        discoDuroLabel.setText(discosString.toString());
+        tarjetaGraficaLabel.setText(graphicCardString.toString());
+        tarjetaSonidoLabel.setText(tarjetaSonidoString.toString());
+        temperaturaCPU.setText(String.valueOf(sistema.getHardware().getSensors().getCpuTemperature()));
 
-        /**/
-        //Lista de procesos
+        Thread monitoreo = new Thread(() -> {
+            while (true) {
+                try {
+                    Platform.runLater(() -> {
+
+                        totalMemoryRam.setText(utilidad.formatBytes(totalMemory));
+                        totalUsageRam.setText(utilidad.formatBytes(usedMemory));
+                        totalAvailableRam.setText(utilidad.formatBytes(availableMemory));
+                        minUsageRam.setText(utilidad.formatPercentage(valorMinimo));
+                        maxUsageRam.setText(utilidad.formatPercentage(valorMaximo));
+
+                    }
+                    );
+
+                    Thread.sleep(5000);
+
+                } catch (InterruptedException ex) {
+                    System.out.println("");
+                }
+                numeroDeGraficas++;
+                actualizarInformacionMemoria(inicializado);
+                utilidad.actualizarPieRAM(pieDeUsoGrafic, usedMemory, availableMemory);
+                utilidad.actualizarGraficaUsoRAM(series, String.valueOf(numeroDeGraficas), utilidad.formatBytesToInteger(usedMemory));
+            }
+        }
+        );
+        monitoreo.setDaemon(true);
+        monitoreo.start();
+    }
+
+    private void actualizarInformacionMemoria(boolean ini) {
+
+        GlobalMemory memory = sistema.getHardware().getMemory();
+
+        totalMemory = memory.getTotal();
+        availableMemory = memory.getAvailable();
+        usedMemory = totalMemory - availableMemory;
+        double percentageUsed = (usedMemory * 100.0) / totalMemory;
+
+        if (!inicializado) {
+            valorMinimo = percentageUsed;
+            valorMaximo = percentageUsed;
+            inicializado = true;
+
+        } else {
+            if (valorMinimo > percentageUsed) {
+                valorMinimo = percentageUsed;
+            }
+            if (valorMaximo < percentageUsed) {
+                valorMaximo = percentageUsed;
+            }
+        }
+    }
+
+    private void datosProcesos() {
+
         List<OSProcess> procesos = sistema.getOperatingSystem().getProcesses();
         ObservableList<OSProcess> observableProcesos = FXCollections.observableArrayList(procesos);
         tableViewProcess.setItems(observableProcesos);
@@ -116,10 +206,10 @@ public class PrimaryController implements Initializable {
         });
 
         tableViewProcess.getColumns().addAll(nameColumn, pidColumn, stateColumn, priorityColumn);
-        /**/
-        
-        //Lista de servicios
-        /**/
+    }
+
+    private void datosServicios() {
+
         List<OSService> servicios = sistema.getOperatingSystem().getServices();
         ObservableList<OSService> observableServicios = FXCollections.observableArrayList(servicios);
         tableViewServices.setItems(observableServicios);
@@ -137,62 +227,78 @@ public class PrimaryController implements Initializable {
         serviceStateColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getState().toString()));
 
         tableViewServices.getColumns().addAll(nameServiceColumn, servicePIDNameColumn, serviceStateColumn);
-        
-        /**/
-        /*Lista de discos*/
-        discos.forEach((disk) -> {
-            discosString.append(disk.getModel() + " " + disk.getSize() + "\n");
-        });
-        
-        /**/
-        /**/
-        
-        /**/
-        /*Gráfico de total memoria*/
-        ObservableList <PieChart.Data> pieData = FXCollections.observableArrayList(        
-                new PieChart.Data("Memoria ocupada: ", usedMemory),
-                new PieChart.Data("Memoria disponible: ", availableMemory));
-        
-        pieData.forEach(data -> {
-        
-             data.nameProperty().bind(Bindings.concat(data.getName(), " ", utilidad.formatBytes(data.pieValueProperty().longValue())));
-        });
-
-        pieDeUsoGrafic.getData().addAll(pieData);
-        /**/
-        /**/
-        
-        osLabel.setText(sistema.getOperatingSystem().toString());
-        motherBoardLabel.setText(sistema.getHardware().getComputerSystem().getBaseboard().getManufacturer() + " "
-                + sistema.getHardware().getComputerSystem().getBaseboard().getModel() + " "
-                + sistema.getHardware().getComputerSystem().getBaseboard().getSerialNumber());
-        cpuLabel.setText(sistema.getHardware().getProcessor().toString());
-        ramLabel.setText(sistema.getHardware().getMemory().toString());
-        discoDuroLabel.setText(discosString.toString());
 
     }
 
-    private void actualizarInformacionMemoria(boolean ini) {
+    private void datosUSB() {
 
-        GlobalMemory memory = sistema.getHardware().getMemory();
-        totalMemory = memory.getTotal();
-        availableMemory = memory.getAvailable();
-        usedMemory = totalMemory - availableMemory;
-        percentageUsed = (usedMemory * 100.0) / totalMemory;
+        List<UsbDevice> dispositivosUSB = sistema.getHardware().getUsbDevices(false);
+        ObservableList<UsbDevice> observableUSBdevice = FXCollections.observableArrayList(dispositivosUSB);
 
-        if (!inicializado) {
-            valorMinimo = percentageUsed;
-            valorMaximo = percentageUsed;
-            inicializado = true;
+        TableColumn<UsbDevice, String> nameUSBdevice = new TableColumn<>("Nombre");
+        nameUSBdevice.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
 
-        } else {
-            if (valorMinimo > percentageUsed) {
-                valorMinimo = percentageUsed;
-            }
-            if (valorMaximo < percentageUsed) {
-                valorMaximo = percentageUsed;
-            }
-        }
+        TableColumn<UsbDevice, String> idproducto = new TableColumn<>("Id producto");
+        idproducto.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getProductId()));
+
+        TableColumn<UsbDevice, String> numeroSerial = new TableColumn<>("Número serial");
+        numeroSerial.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSerialNumber()));
+
+        TableColumn<UsbDevice, String> vendor = new TableColumn<>("Vendor");
+        vendor.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getVendor()));
+
+        dispositivosUsbTable.getColumns().addAll(nameUSBdevice, idproducto, numeroSerial, vendor);
+
+    }
+
+    private StringBuilder listaDeDiscos() {
+
+        StringBuilder string = new StringBuilder();
+
+        List<HWDiskStore> discos = sistema.getHardware().getDiskStores();
+
+        discos.forEach((disk) -> {
+            string.append(disk.getModel() + " " + utilidad.formatBytes(disk.getSize()) + "\n");
+        });
+        return string;
+    }
+
+    private StringBuilder listaDeTarjetasGraficas() {
+
+        StringBuilder string = new StringBuilder();
+
+        List<GraphicsCard> graphCard = sistema.getHardware().getGraphicsCards();
+
+        graphCard.forEach((card) -> {
+            string.append(card.getName() + " " + utilidad.formatBytes(card.getVRam()) + "\n");
+        });
+        return string;
+    }
+
+    private StringBuilder listaDeTarjetasSonido() {
+
+        StringBuilder string = new StringBuilder();
+
+        List<SoundCard> soundCard = sistema.getHardware().getSoundCards();
+
+        soundCard.forEach((sCard) -> {
+            string.append(sCard.getName() + " " + sCard.getCodec() + "\n");
+        });
+        return string;
+
+    }
+
+    private void cargarPieDeMemoria() {
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+                new PieChart.Data("Memoria ocupada: ", usedMemory),
+                new PieChart.Data("Memoria disponible: ", availableMemory)
+        );
+        pieData.forEach(data -> {
+            data.nameProperty().bind(Bindings.concat(data.getName(), " ", utilidad.formatBytes(data.pieValueProperty().longValue())));
+        });
+        pieDeUsoGrafic.setData(pieData);
+
     }
 
 }

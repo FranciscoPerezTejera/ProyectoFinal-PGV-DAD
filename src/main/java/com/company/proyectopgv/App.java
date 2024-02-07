@@ -11,32 +11,20 @@ import java.io.IOException;
 public class App extends Application {
 
     private static Scene scene;
-    private final int MIN_HEIGHT = 730;
-     private final int MIN_WIDTH = 1290;
+    public static Stage stage;
+    private final int MIN_HEIGHT = 720;
+    private final int MIN_WIDTH = 1280;
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), MIN_WIDTH, MIN_HEIGHT);
-        stage.setScene(scene);
-        
-        // Configurar el listener para la altura y lo limito al final de altura mínima
-         stage.heightProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() < MIN_HEIGHT) {
-                stage.setHeight(MIN_HEIGHT);
-            }
-        });
-
-        // Configurar el listener para la anchura y lo limito al final de anchura mínima
-        stage.widthProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() < MIN_WIDTH) {
-                stage.setWidth(MIN_WIDTH);
-            }
-        });
-
-        stage.show();
+        this.stage = stage;
+        scene = new Scene(loadFXML("Login"), MIN_WIDTH, MIN_HEIGHT);
+        this.stage.setScene(scene);
+        this.stage.setResizable(false);
+        this.stage.show();
     }
 
-    static void setRoot(String fxml) throws IOException {
+    public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
 
