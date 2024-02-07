@@ -26,8 +26,6 @@ import oshi.hardware.Display;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.GraphicsCard;
 import oshi.hardware.HWDiskStore;
-import oshi.hardware.HardwareAbstractionLayer;
-import oshi.hardware.Sensors;
 import oshi.hardware.SoundCard;
 import oshi.hardware.UsbDevice;
 import oshi.software.os.OSProcess;
@@ -109,27 +107,9 @@ public class PrimaryController implements Initializable {
         datosProcesos();
         datosServicios();
         datosUSB();
-        StringBuilder discosString = listaDeDiscos();
-        StringBuilder graphicCardString = listaDeTarjetasGraficas();
-        StringBuilder tarjetaSonidoString = listaDeTarjetasSonido();
         cargarPieDeMemoria();
-
-        totalMemoryRam.setText(utilidad.formatBytes(totalMemory));
-        totalAvailableRam.setText(utilidad.formatBytes(availableMemory));
-        totalUsageRam.setText(utilidad.formatBytes(usedMemory));
-        minUsageRam.setText(utilidad.formatPercentage(valorMinimo));
-        maxUsageRam.setText(utilidad.formatPercentage(valorMaximo));
-
-        osLabel.setText(sistema.getOperatingSystem().toString());
-        motherBoardLabel.setText(sistema.getHardware().getComputerSystem().getBaseboard().getManufacturer() + " "
-                + sistema.getHardware().getComputerSystem().getBaseboard().getModel() + " "
-                + sistema.getHardware().getComputerSystem().getBaseboard().getSerialNumber());
-        cpuLabel.setText(sistema.getHardware().getProcessor().toString());
-        ramLabel.setText(sistema.getHardware().getMemory().toString());
-        discoDuroLabel.setText(discosString.toString());
-        tarjetaGraficaLabel.setText(graphicCardString.toString());
-        tarjetaSonidoLabel.setText(tarjetaSonidoString.toString());
-        temperaturaCPU.setText(String.valueOf(sistema.getHardware().getSensors().getCpuTemperature()));
+        cargarXYChart();
+        llenadoDatosEstaticos();
 
         Thread monitoreo = new Thread(() -> {
             while (true) {
@@ -301,4 +281,37 @@ public class PrimaryController implements Initializable {
 
     }
 
+    private void cargarXYChart() {
+
+        yMemory.setLabel("Porcentaje de RAM");
+        series = new XYChart.Series();
+        series.setName("Uso de la RAM");
+        series.getData().add(new XYChart.Data(String.valueOf(numeroDeGraficas), utilidad.formatBytesToInteger(usedMemory)));
+        usoDeRamGrafic.getData().add(series);
+
+    }
+
+    private void llenadoDatosEstaticos() {
+
+        StringBuilder discosString = listaDeDiscos();
+        StringBuilder graphicCardString = listaDeTarjetasGraficas();
+        StringBuilder tarjetaSonidoString = listaDeTarjetasSonido();
+
+        totalMemoryRam.setText(utilidad.formatBytes(totalMemory));
+        totalAvailableRam.setText(utilidad.formatBytes(availableMemory));
+        totalUsageRam.setText(utilidad.formatBytes(usedMemory));
+        minUsageRam.setText(utilidad.formatPercentage(valorMinimo));
+        maxUsageRam.setText(utilidad.formatPercentage(valorMaximo));
+
+        osLabel.setText(sistema.getOperatingSystem().toString());
+        motherBoardLabel.setText(sistema.getHardware().getComputerSystem().getBaseboard().getManufacturer() + " "
+                + sistema.getHardware().getComputerSystem().getBaseboard().getModel() + " "
+                + sistema.getHardware().getComputerSystem().getBaseboard().getSerialNumber());
+        cpuLabel.setText(sistema.getHardware().getProcessor().toString());
+        ramLabel.setText(sistema.getHardware().getMemory().toString());
+        discoDuroLabel.setText(discosString.toString());
+        tarjetaGraficaLabel.setText(graphicCardString.toString());
+        tarjetaSonidoLabel.setText(tarjetaSonidoString.toString());
+        temperaturaCPU.setText(String.valueOf(sistema.getHardware().getSensors().getCpuTemperature()) + " ºC");
+    }
 }
