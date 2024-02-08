@@ -6,8 +6,6 @@
     <version>1.0-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <dependencies>
         <dependency>
@@ -26,9 +24,10 @@
             <version>6.4.0</version>
         </dependency>
         <dependency>
-            <groupId>com.profesorfalken</groupId>
-            <artifactId>WMI4Java</artifactId>
-            <version>1.6.3</version>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.21.0</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
@@ -38,7 +37,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <release>11</release>
+                    <release>9</release>
                 </configuration>
             </plugin>
             <plugin>

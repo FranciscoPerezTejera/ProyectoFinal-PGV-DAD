@@ -1,16 +1,38 @@
 package com.company.proyectopgv.pruebas;
 
+import java.util.List;
 import oshi.SystemInfo;
+import oshi.hardware.HWDiskStore;
+import oshi.hardware.HWPartition;
 
 public class Purebas {
+
     public static void main(String[] args) {
         SystemInfo sistema = new SystemInfo();
-       /*List <UsbDevice> procesos = sistema.getHardware().get;
+        List<HWDiskStore> d = sistema.getHardware().getDiskStores();
+        List<HWPartition> discos = null;
+        d.forEach((t) -> {
+
+            discos.add((HWPartition) t.getPartitions());
+
+        });
+
+        discos.forEach((t) -> {
+
+            System.out.println("  Partición: " + t.getName());
+            System.out.println("    Tamaño total: " + t.getSize() + " bytes");
+            System.out.println("    Tamaño usado: " + t.getMajor() + " bytes");
+            System.out.println("    Tamaño usado: " + t.getMinor() + " bytes");
+            System.out.println("    Tamaño disponible: " + t.getSize() + " bytes");
+
+        });
+
+        /*List <UsbDevice> procesos = sistema.getHardware().get;
         procesos.forEach((e) -> {
             System.out.println(e.toString());
         });*/
         System.out.println(sistema.getOperatingSystem());
-/*  
+        /*  
      SystemInfo sistema = new SystemInfo();
         
     sistema.getOperatingSystem().getNetworkParams(): devuelve los datos de RED del equipo
@@ -39,7 +61,7 @@ public class Purebas {
     sistema.getHardware().getProcessor(): devuelve toda la información de la CPU
     sistema.getHardware().getSensors(): devuelve la información de temperatura de la CPU, voltaje
         y velocidad de los ventiladores
-    */
+         */
     }
-    
+
 }

@@ -1,7 +1,10 @@
 package com.company.proyectopgv.controller;
 
+import com.company.proyectopgv.utils.ParseadorCSV;
 import com.company.proyectopgv.utils.Utils;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -64,13 +67,11 @@ public class PrimaryController implements Initializable {
     @FXML
     private LineChart<Number, Number> usoDeRamGrafic;
     @FXML
-    private TableView<?> diskProcessActivityTable;
+    private TableView<HWDiskStore> diskProcessActivityTable;
     @FXML
-    private AreaChart<?, ?> diskActivityGrafic;
+    private AreaChart<Number, Number> diskActivityGrafic;
     @FXML
-    private TableView<?> storageTable;
-    @FXML
-    private LineChart<?, ?> usageRedGrafic;
+    private LineChart<Number, Number> usageRedGrafic;
     @FXML
     private TableView<OSService> tableViewServices;
     @FXML
@@ -98,8 +99,17 @@ public class PrimaryController implements Initializable {
     private boolean inicializado;
     private int numeroDeGraficas;
     private double porcentajeUsoCPU;
+    private long velocidadRed;
     private XYChart.Series seriesRam;
     private XYChart.Series seriesCPU;
+    private XYChart.Series seriesRed;
+    private long lectura;
+    private long escritura;
+    private StringBuilder discosString;
+    private StringBuilder graphicCardString;
+    private StringBuilder tarjetaSonidoString;
+    private List<HWDiskStore> disks;
+    List<XYChart.Series> discosSeries;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -107,10 +117,12 @@ public class PrimaryController implements Initializable {
         utilidad = new Utils();
         sistema = new SystemInfo();
         inicializado = false;
+        discosSeries = new ArrayList<>();
         numeroDeGraficas = 1;
         actualizarInformacionMemoria(inicializado);
         datosProcesos();
         datosServicios();
+        datosDeDiscos();
         datosUSB();
         cargarPieDeMemoria();
         cargarXYChart();
@@ -127,9 +139,12 @@ public class PrimaryController implements Initializable {
                         minUsageRam.setText(utilidad.formatPercentage(valorMinimo));
                         maxUsageRam.setText(utilidad.formatPercentage(valorMaximo));
                         porcentajeUsoCPU = sistema.getHardware().getProcessor().getSystemCpuLoad(500) * 100;
+                        refrescoDeDatosProceso();
+                        refrescoDatosDeServicio();
+                        refrescoDatosDeDiscos();
                     }
                     );
-                    
+
                     Thread.sleep(5000);
 
                 } catch (InterruptedException ex) {
@@ -139,7 +154,9 @@ public class PrimaryController implements Initializable {
                 actualizarInformacionMemoria(inicializado);
                 utilidad.actualizarPieRAM(pieDeUsoGrafic, usedMemory, availableMemory);
                 utilidad.actualizarGraficaUsoRAM(seriesRam, String.valueOf(numeroDeGraficas), utilidad.formatBytesToouble(usedMemory));
-                utilidad.actualizarGraficaUsoCPU(seriesCPU, String.valueOf(numeroDeGraficas), (int)porcentajeUsoCPU);
+                utilidad.actualizarGraficaUsoCPU(seriesCPU, String.valueOf(numeroDeGraficas), (int) porcentajeUsoCPU);
+                //utilidad.actualizarGraficaDisco(seriesDiscos, String.valueOf(numeroDeGraficas), lectura);
+                //utilidad.actualizarGraficaRed(seriesRed, String.valueOf(numeroDeGraficas), velocidadRed);
             }
         }
         );
@@ -149,6 +166,30 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private void onSearchServer(ActionEvent event) {
+
+    }
+
+    @FXML
+    private void onClickReporte(ActionEvent event) {
+        
+        String cpu = cpuLabel.getText();
+        String memoria = ramLabel.getText();
+        String cpuString = cpu.substring(cpu.indexOf("Inte") + 0,  cpu.indexOf("\n"));
+        String memoriaString = memoria.replace(",", ".");
+
+        String datosToCsv =  osLabel.getText() + ","
+                + motherBoardLabel.getText() + ","
+                + cpuString + ","
+                + temperaturaCPU.getText() + ","
+                + memoriaString + ","
+                + totalMemoryRam.getText().replace(",", ".") + ","
+                + totalAvailableRam.getText().replace(",", ".") + ","
+                + totalUsageRam.getText().replace(",", ".") + ","
+                + utilidad.formatBytesToDoubleJasper(usedMemory).replace(",", ".") + ","
+                + utilidad.formatBytesToDoubleJasper(availableMemory).replace(",", ".");
+
+        System.out.println(datosToCsv);
+        ParseadorCSV.guardarDatosEnCsv(datosToCsv);
 
     }
 
@@ -178,9 +219,7 @@ public class PrimaryController implements Initializable {
 
     private void datosProcesos() {
 
-        List<OSProcess> procesos = sistema.getOperatingSystem().getProcesses();
-        ObservableList<OSProcess> observableProcesos = FXCollections.observableArrayList(procesos);
-        tableViewProcess.setItems(observableProcesos);
+        refrescoDeDatosProceso();
 
         TableColumn<OSProcess, String> pidColumn = new TableColumn<>("PID");
         pidColumn.setCellValueFactory(data -> new SimpleStringProperty(Integer.toString(data.getValue().getProcessID())));
@@ -195,11 +234,21 @@ public class PrimaryController implements Initializable {
         priorityColumn.setCellValueFactory(data -> {
             return new SimpleStringProperty(Integer.toString(data.getValue().getPriority()));
         });
-
         tableViewProcess.getColumns().addAll(nameColumn, pidColumn, stateColumn, priorityColumn);
+        tableViewProcess.getSortOrder().add(nameColumn);
+    }
+
+    private void refrescoDeDatosProceso() {
+        tableViewProcess.getItems().clear();
+        List<OSProcess> procesos = sistema.getOperatingSystem().getProcesses();
+        ObservableList<OSProcess> observableProcesos = FXCollections.observableArrayList(procesos);
+        observableProcesos.sort(Comparator.comparing(oSProcess -> oSProcess.getPriority()));
+        tableViewProcess.setItems(observableProcesos);
     }
 
     private void datosServicios() {
+
+        refrescoDatosDeServicio();
 
         List<OSService> servicios = sistema.getOperatingSystem().getServices();
         ObservableList<OSService> observableServicios = FXCollections.observableArrayList(servicios);
@@ -218,7 +267,15 @@ public class PrimaryController implements Initializable {
         serviceStateColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getState().toString()));
 
         tableViewServices.getColumns().addAll(nameServiceColumn, servicePIDNameColumn, serviceStateColumn);
+        tableViewServices.getSortOrder().add(nameServiceColumn);
+    }
 
+    private void refrescoDatosDeServicio() {
+        tableViewServices.getItems().clear();
+        List<OSService> servicios = sistema.getOperatingSystem().getServices();
+        ObservableList<OSService> observableServicios = FXCollections.observableArrayList(servicios);
+        observableServicios.sort(Comparator.comparing(osService -> osService.getProcessID()));
+        tableViewServices.setItems(observableServicios);
     }
 
     private void datosUSB() {
@@ -310,13 +367,25 @@ public class PrimaryController implements Initializable {
         seriesCPU.getData().add(new XYChart.Data(String.valueOf(numeroDeGraficas), porcentajeUsoCPU));
         cpuGrafic.getData().add(seriesCPU);
 
+        /*Ejes de gráfica de Lectura/Escritura Discos*/
+ /*seriesDiscos = new XYChart.Series();
+        seriesDiscos.setName("Escritura/Lectura de disco");
+        seriesDiscos.getData().add(new XYChart.Data(String.valueOf(numeroDeGraficas), lectura));
+        seriesDiscos.getData().add(new XYChart.Data(String.valueOf(numeroDeGraficas), escritura));
+        diskActivityGrafic.getData().add(seriesDiscos);*/
+ /*Ejes de gráfica de Uso de Red*/
+        seriesRed = new XYChart.Series();
+        seriesRed.setName("Escritura/Lectura de disco");
+        seriesRed.getData().add(new XYChart.Data(String.valueOf(numeroDeGraficas), velocidadRed));
+        usageRedGrafic.getData().add(seriesRed);
+
     }
 
     private void llenadoDatosEstaticos() {
 
-        StringBuilder discosString = listaDeDiscos();
-        StringBuilder graphicCardString = listaDeTarjetasGraficas();
-        StringBuilder tarjetaSonidoString = listaDeTarjetasSonido();
+        discosString = listaDeDiscos();
+        graphicCardString = listaDeTarjetasGraficas();
+        tarjetaSonidoString = listaDeTarjetasSonido();
 
         totalMemoryRam.setText(utilidad.formatBytes(totalMemory));
         totalAvailableRam.setText(utilidad.formatBytes(availableMemory));
@@ -336,4 +405,46 @@ public class PrimaryController implements Initializable {
         temperaturaCPU.setText(String.valueOf(sistema.getHardware().getSensors().getCpuTemperature()) + " ºC");
     }
 
+    private void datosDeDiscos() {
+
+        refrescoDatosDeDiscos();
+
+        TableColumn<HWDiskStore, String> name = new TableColumn<>("Nombre");
+        name.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getModel()));
+
+        TableColumn<HWDiskStore, String> lectura = new TableColumn<>("Lectura/s");
+        lectura.setCellValueFactory(data -> {
+
+            return new SimpleStringProperty(utilidad.formatBytesKb(data.getValue().getReadBytes()));
+        });
+
+        TableColumn<HWDiskStore, String> escritura = new TableColumn<>("Escritura/s");
+        escritura.setCellValueFactory(data -> {
+            return new SimpleStringProperty(utilidad.formatBytesKb(data.getValue().getWrites()));
+        });
+
+        TableColumn<HWDiskStore, String> tamaño = new TableColumn<>("Tamaño");
+        tamaño.setCellValueFactory(data -> {
+            return new SimpleStringProperty(utilidad.formatBytes(data.getValue().getSize()));
+        });
+
+        TableColumn<HWDiskStore, String> tiempo = new TableColumn<>("Tiempo activo");
+        tiempo.setCellValueFactory(data -> {
+            return new SimpleStringProperty(String.valueOf(data.getValue().getTransferTime()));
+        });
+
+        diskProcessActivityTable.getColumns().addAll(name, lectura, escritura, tamaño, tiempo);
+        diskProcessActivityTable.getSortOrder().add(name);
+
+    }
+
+    private void refrescoDatosDeDiscos() {
+        diskProcessActivityTable.getItems().clear();
+        disks = sistema.getHardware().getDiskStores();
+
+        ObservableList<HWDiskStore> observableProcesosDisco = FXCollections.observableArrayList(disks);
+        observableProcesosDisco.sort(Comparator.comparing(osService -> osService.getSize()));
+        diskProcessActivityTable.setItems(observableProcesosDisco);
+
+    }
 }
